@@ -1,5 +1,18 @@
 <!doctype html>
 <html lang="en">
+<script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+<script>
+	function getPos(){
+		$.post( "DataRequest.php", function( data ) {
+			document.getElementById("eye").innerHTML = data;
+		});
+	}
+	getPos();
+
+	setInterval(function(){
+		getPos()
+	}, 500)
+</script>
 <head>
   <meta charset="utf-8">
 
@@ -8,7 +21,8 @@
   <meta name="author" content="Jacob">
 </head>
 <body>
-TEST REEE <br>
-More test here lmao
+<h2 id="eye">W</h2>
+TEST<br>
+
 </body>
 </html>
