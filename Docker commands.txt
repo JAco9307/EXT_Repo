@@ -1,2 +1,0 @@
-#!/bin/sh
-sudo docker build --tag web_host:1.0 .; sudo docker rm -f apache_container; sudo docker run -d --network="host" --name apache_container web_host:1.0
