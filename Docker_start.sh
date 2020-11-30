@@ -1,1 +1,1 @@
-sudo docker build --tag web_host:1.0 .; sudo docker rm -f apache_container; sudo docker run -d --network="host" --name apache_container web_host:1.0
+sudo docker build --tag web_host:1.0 .; sudo docker rm -f apache_container; sudo docker run -d --network="host" -v /home/pi/EXT_Repo/htdocs:/usr/local/apache2/htdocs/ --name apache_container web_host:1.0
