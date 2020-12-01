@@ -4,7 +4,10 @@
 <script>
 	function getPos(){
 		$.post( "DataRequest.php", function( data ) {
-			document.getElementById("eye").innerHTML = data;
+			var parsed = data.split(";");
+			var joypos = parsed[0].split(",");
+			var coords = parsed[1].split(",");
+			document.getElementById("eye").innerHTML = joypos[1];
 		});
 	}
 	getPos();
@@ -16,13 +19,20 @@
 <head>
   <meta charset="utf-8">
 
-  <title>The HTML5</title>
+  <title>Leap Joystick Web</title>
+  <link rel="icon" href="LeapLogo.png">
   <meta name="description" content="HTML5">
   <meta name="author" content="Jacob">
+  <link rel="stylesheet" href="Style.css">
 </head>
 <body>
-<h2 id="eye">W</h2>
-TEST<br>
-
+	<div class="joy">
+		<h2 id="eye">
+			W
+		</h2>
+	</div>
+	<div class="coord">
+		
+	</div>
 </body>
 </html>

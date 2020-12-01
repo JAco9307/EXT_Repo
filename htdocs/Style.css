@@ -1,0 +1,27 @@
+:root{
+	--primary1:  #f58224;
+	--primary2:  #ffffff;
+	--secondary1:#005cff;
+	--secondary2:#333333;
+	--tertiary1: #f9f9f9;
+	--tertiary2: #005a87;
+}
+div{
+	border-width:3px;
+	border-style:solid;
+	border-color:var(--secondary2);
+}
+.joy{
+	position: fixed;
+	top: 0;
+	left: 0.5vw;
+	height:98vh;
+	width:33vw;
+}
+.coord{
+	position: fixed;
+	top: 0;
+	left: 34vw;
+	height:98vh;
+	width:65vw;
+}
