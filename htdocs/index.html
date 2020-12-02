@@ -1,38 +1,96 @@
 <!doctype html>
 <html lang="en">
 <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
-<script>
-	function getPos(){
-		$.post( "DataRequest.php", function( data ) {
-			var parsed = data.split(";");
-			var joypos = parsed[0].split(",");
-			var coords = parsed[1].split(",");
-			document.getElementById("eye").innerHTML = joypos[1];
-		});
-	}
-	getPos();
-
-	setInterval(function(){
-		getPos()
-	}, 500)
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <head>
   <meta charset="utf-8">
 
   <title>Leap Joystick Web</title>
   <link rel="icon" href="LeapLogo.png">
-  <meta name="description" content="HTML5">
-  <meta name="author" content="Jacob">
   <link rel="stylesheet" href="Style.css">
 </head>
 <body>
 	<div class="joy">
-		<h2 id="eye">
-			W
+		<h2 id="X1">
+			X
 		</h2>
+		<h2 id="Y1">
+			Y
+		</h2>
+		<h2 id="Z1">
+			Z
+		</h2>
+		
 	</div>
 	<div class="coord">
-		
+		<canvas id="myChart" class="chart"></canvas>
+		<script>
+			var ctx = document.getElementById("myChart").getContext('2d');
+			var myChart = new Chart(ctx, {
+				type: 'scatter',
+				data: {
+					labels: ['Red'],
+					datasets: [{
+						label: 'Crane posistion',
+						data: null,
+						pointRadius: 8,
+						pointHoverRadius: 8,
+						backgroundColor: "#f58224",
+						borderColor: "#f58224",
+						borderWidth: 1
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: true,
+								suggestedMin: 100,
+								suggestedMax: 100,
+								stepSize: 2
+							}
+						}],
+						xAxes: [{
+							ticks: {
+								beginAtZero: true,
+								suggestedMin: 100,
+								suggestedMax: 100,
+								stepSize: 2
+							}
+						}]
+					}
+				}
+			});
+			function UpdateFunc(){
+			$.post( "DataRequest.php", function( data ) {
+				try{
+					var parsed = data.split(";");
+					var joypos = parsed[0].split(",");
+					var coords = parsed[1].split(",");
+					document.getElementById("X1").innerHTML = joypos[0]; //-200:200
+					document.getElementById("Y1").innerHTML = joypos[1]; //-200:200
+					document.getElementById("Z1").innerHTML = joypos[2]; //-1:1
+				}catch (err){
+					console.log(err.message);
+				}
+				try{
+					var chart_data = {x: parseInt(coords[0]),y: parseInt(coords[1])};
+										
+					myChart.data.datasets[0].data[0] = chart_data;
+					myChart.update();
+				}catch(err){
+					console.log(err.message);
+				}
+			});					
+		}
+
+		setInterval(function(){
+			UpdateFunc()
+		}, 500)
+
+		</script>
 	</div>
 </body>
 </html>
