@@ -31,6 +31,6 @@
 *.out
 *.app
 
-#Compile files
+#Compile specific files
 /OtherFiles/CLI
 /OtherFiles/MotorController
