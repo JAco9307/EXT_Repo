@@ -1,0 +1,1 @@
+g++ -o MotorController DaemonTest.cpp; g++ -o CLI ValueUpdate.cpp; echo "Done" 
