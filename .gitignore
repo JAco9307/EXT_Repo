@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+#Compile files
+./OtherFiles/CLI
+./OtherFiles/MotorController
