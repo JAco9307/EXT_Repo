@@ -32,5 +32,5 @@
 *.app
 
 #Compile files
-./OtherFiles/CLI
-./OtherFiles/MotorController
+/OtherFiles/CLI
+/OtherFiles/MotorController
