@@ -1,1 +1,1 @@
-g++ -o MotorController DaemonTest.cpp; g++ -o CLI ValueUpdate.cpp; echo "Done" 
+g++ -o MotorController DaemonTest.cpp; g++ -o CLI ValueUpdate.cpp; echo "Done"; sudo mv CLI /usr/bin/
