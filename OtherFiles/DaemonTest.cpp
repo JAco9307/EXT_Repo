@@ -76,7 +76,7 @@ void CopyMemory(int (&JoystPos)[3], int* const Recieve){
 void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]){
     int i = 3;
     while(i-->0){
-        if(CranePos[i] + JoystPos[i] > 10000) CranePos[i] = 10000;
+        if(CranePos[i] + JoystPos[i] > 20000) CranePos[i] = 20000;
         else if(CranePos[i] + JoystPos[i] < 0) CranePos[i] = 0;
         else CranePos[i] += JoystPos[i];
     }
@@ -91,6 +91,6 @@ void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]){
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]){  
     std::ofstream ofs;
     ofs.open("../htdocs/CranePos.txt", std::ofstream::out | std::ofstream::trunc);
-    ofs << JoystPos[0] << ',' << JoystPos[1] << ',' << JoystPos[2] << ';' << CranePos[0]/10 << ',' << CranePos[1]/10 << ',' << CranePos[2]/100;
+    ofs << JoystPos[0] << ',' << JoystPos[1] << ',' << JoystPos[2] << ';' << CranePos[0]/20 << ',' << CranePos[1]/20 << ',' << CranePos[2]/20;
     ofs.close();
 }
