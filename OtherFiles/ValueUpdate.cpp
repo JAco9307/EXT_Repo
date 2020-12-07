@@ -17,9 +17,14 @@ int main(int argc, char* argv[])
     key_t key = ftok("shmfile", 66);
 
     SizeMem = sizeof(*array) * count;
-    shmid = shmget(key, count * sizeof(int), IPC_CREAT);
+    shmid = shmget(key, count * sizeof(int), IPC_CREAT | 0660);
+	if (shmid == -1) {
+		perror("Could not get shared memory");
+	}
     array = (int*)shmat(shmid, 0, 0);
-
+	if (array == reinterpret_cast<void*>(-1)) {
+		perror("Could not get shared memory location");
+	}
     array[0] = Delta_x;
     array[1] = Delta_y;
     array[2] = Delta_z;
