@@ -41,6 +41,6 @@ div{
  	height:32vw;
 }
 .zdiv{
-	width:15vw;
+	width:10vw;
 	height:calc(100% - 32vw - 12px);
 }

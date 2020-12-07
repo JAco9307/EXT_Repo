@@ -7,7 +7,7 @@
 
   <title>Leap Joystick Web</title>
   <link rel="icon" href="LeapLogo.png">
-  <link rel="stylesheet" href="Style.css">
+  <link rel="stylesheet" href="Style2.css">
 </head>
 <body>
 	<div class="joy">
@@ -29,20 +29,29 @@
 	var Joychart = new Chart(ctxJ, {
 		type: 'scatter',
 		data: {
-			labels: ['Pos'],
+			labels: [''],
 			datasets: [{
-				label: '',
+				label: 'Joystick Posistion',
 				data: null,
-				pointRadius: 8,
-				pointHoverRadius: 8,
+				pointRadius: 5,
+				pointHoverRadius: 5,
 				backgroundColor: "#f58224",
 				borderColor: "#f58224",
+				borderWidth: 1
+			},
+			{
+				label: 'Deadzone',
+				data: [{x:0,y:0}],
+				pointRadius: 20,
+				pointHoverRadius: 20,
+				fill: false,
+				borderColor: "#005a87",
 				borderWidth: 1
 			}]
 		},
 		options: {
 			legend: {
-				display: false,
+				display: true,
 			},
 			responsive: true,
 			maintainAspectRatio: false,
@@ -69,14 +78,42 @@
 	});
 	var Zchart = new Chart(ctxZ, {
 		type: 'bar',
+		data:{
+			labels: [''],
+			datasets: [{
+				label: 'Joystick z-axis',
+				data: [0],
+				backgroundColor: "#f58224",
+				borderColor: "#f58224",
+				borderWidth: 1
+			}]
+		},
+		options: {
+			responsive:true,
+			maintainAspectRatio: false,
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero: true,
+						suggestedMin: -10,
+						suggestedMax: 10,
+						stepSize: 2,
+						callback: function(value, index, values) {
+							if (value == 4 || value == -4) return 'Deadzone';
+                        	return value;
+                    	}
+					}
+				}]
+			}
+		}
 		
 	});
 	var myChart = new Chart(ctxC, {
 		type: 'scatter',
 		data: {
-			labels: ['Red'],
+			labels: [''],
 			datasets: [{
-				label: '',
+				label: 'Crane Posistion',
 				data: null,
 				pointRadius: 8,
 				pointHoverRadius: 8,
@@ -87,7 +124,7 @@
 		},
 		options: {
 			legend: {
-				display: false,
+				display: true,
 			},
 			responsive: true,
 			maintainAspectRatio: false,
@@ -123,7 +160,9 @@
 		try{
 			var chart_data = {x: parseInt(coords[0]),y: parseInt(coords[1])};
 			var chart_dataJ = {x: parseInt(joypos[0]),y: parseInt(joypos[1])};
-							
+
+			Zchart.data.datasets[0].data[0] = joypos[2];
+			Zchart.update();		
 			myChart.data.datasets[0].data[0] = chart_data;
 			myChart.update();
 			Joychart.data.datasets[0].data[0] = chart_dataJ;
