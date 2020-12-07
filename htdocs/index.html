@@ -11,89 +11,132 @@
 </head>
 <body>
 	<div class="joy">
-		<h2 id="X1">
-			X
-		</h2>
-		<h2 id="Y1">
-			Y
-		</h2>
-		<h2 id="Z1">
-			Z
-		</h2>
-		
+		<div class="joydiv">
+			<canvas id="Joychart" class="joychart"></canvas>
+		</div>
+		<div class="zdiv">
+			<canvas id="Zbar" class="zbar"></canvas>
+		</div>
 	</div>
 	<div class="coord">
 		<canvas id="myChart" class="chart"></canvas>
-		<script>
-			var ctx = document.getElementById("myChart").getContext('2d');
-			var myChart = new Chart(ctx, {
-				type: 'scatter',
-				data: {
-					labels: ['Red'],
-					datasets: [{
-						label: '',
-						data: null,
-						pointRadius: 8,
-						pointHoverRadius: 8,
-						backgroundColor: "#f58224",
-						borderColor: "#f58224",
-						borderWidth: 1
-					}]
-				},
-				options: {
-					legend: {
-						display: false,
-					},
-					responsive: true,
-					maintainAspectRatio: false,
-					scales: {
-						yAxes: [{
-							ticks: {
-								beginAtZero: true,
-								suggestedMin: 100,
-								suggestedMax: 100,
-								stepSize: 2
-							}
-						}],
-						xAxes: [{
-							ticks: {
-								beginAtZero: true,
-								suggestedMin: 100,
-								suggestedMax: 100,
-								stepSize: 2
-							}
-						}]
-					}
-				}
-			});
-			function UpdateFunc(){
-			$.post( "DataRequest.php", function( data ) {
-				try{
-					var parsed = data.split(";");
-					var joypos = parsed[0].split(",");
-					var coords = parsed[1].split(",");
-					document.getElementById("X1").innerHTML = joypos[0]; //-200:200
-					document.getElementById("Y1").innerHTML = joypos[1]; //-200:200
-					document.getElementById("Z1").innerHTML = joypos[2]; //-1:1
-				}catch (err){
-					console.log(err.message);
-				}
-				try{
-					var chart_data = {x: parseInt(coords[0]),y: parseInt(coords[1])};
-										
-					myChart.data.datasets[0].data[0] = chart_data;
-					myChart.update();
-				}catch(err){
-					console.log(err.message);
-				}
-			});					
-		}
-
-		setInterval(function(){
-			UpdateFunc()
-		}, 500)
-
-		</script>
 	</div>
 </body>
+<script>
+	var ctxJ = document.getElementById("Joychart").getContext('2d');
+	var ctxZ = document.getElementById("Zbar").getContext('2d');
+	var ctxC = document.getElementById("myChart").getContext('2d');
+	var Joychart = new Chart(ctxJ, {
+		type: 'scatter',
+		data: {
+			labels: ['Pos'],
+			datasets: [{
+				label: '',
+				data: null,
+				pointRadius: 8,
+				pointHoverRadius: 8,
+				backgroundColor: "#f58224",
+				borderColor: "#f58224",
+				borderWidth: 1
+			}]
+		},
+		options: {
+			legend: {
+				display: false,
+			},
+			responsive: true,
+			maintainAspectRatio: false,
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero: false,
+						suggestedMin: -200,
+						suggestedMax: 200,
+						stepSize: 20
+					}
+				}],
+				xAxes: [{
+					ticks: {
+						beginAtZero: false,
+						suggestedMin: -200,
+						suggestedMax: 200,
+						stepSize: 20
+					}
+				}]
+			}
+		}
+
+	});
+	var Zchart = new Chart(ctxZ, {
+		type: 'bar',
+		
+	});
+	var myChart = new Chart(ctxC, {
+		type: 'scatter',
+		data: {
+			labels: ['Red'],
+			datasets: [{
+				label: '',
+				data: null,
+				pointRadius: 8,
+				pointHoverRadius: 8,
+				backgroundColor: "#f58224",
+				borderColor: "#f58224",
+				borderWidth: 1
+			}]
+		},
+		options: {
+			legend: {
+				display: false,
+			},
+			responsive: true,
+			maintainAspectRatio: false,
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero: true,
+						suggestedMin: 1000,
+						suggestedMax: 1000,
+						stepSize: 25
+					}
+				}],
+				xAxes: [{
+					ticks: {
+						beginAtZero: true,
+						suggestedMin: 1000,
+						suggestedMax: 1000,
+						stepSize: 25
+					}
+				}]
+			}
+		}
+	});
+	function UpdateFunc(){
+	$.post( "DataRequest.php", function( data ) {
+		try{
+			var parsed = data.split(";");
+			var joypos = parsed[0].split(",");
+			var coords = parsed[1].split(",");
+		}catch (err){
+			console.log(err.message);
+		}
+		try{
+			var chart_data = {x: parseInt(coords[0]),y: parseInt(coords[1])};
+			var chart_dataJ = {x: parseInt(joypos[0]),y: parseInt(joypos[1])};
+							
+			myChart.data.datasets[0].data[0] = chart_data;
+			myChart.update();
+			Joychart.data.datasets[0].data[0] = chart_dataJ;
+			Joychart.update();
+		}catch(err){
+			console.log(err.message);
+		}
+	});					
+}
+
+setInterval(function(){
+	UpdateFunc()
+}, 500)
+
+</script>
 </html>
