@@ -38,7 +38,7 @@
 				backgroundColor: "#f58224",
 				borderColor: "#f58224",
 				borderWidth: 1
-			},
+			}/*,
 			{
 				label: 'Deadzone',
 				data: [{x:0,y:0}],
@@ -47,7 +47,7 @@
 				fill: false,
 				borderColor: "#005a87",
 				borderWidth: 1
-			}]
+			}*/]
 		},
 		options: {
 			legend: {
@@ -95,13 +95,13 @@
 				yAxes: [{
 					ticks: {
 						beginAtZero: true,
-						suggestedMin: -10,
-						suggestedMax: 10,
-						stepSize: 2,
+						suggestedMin: -1,
+						suggestedMax: 1,
+						stepSize: 1/*,
 						callback: function(value, index, values) {
 							if (value == 4 || value == -4) return 'Deadzone';
                         	return value;
-                    	}
+                    	}*/
 					}
 				}]
 			}
