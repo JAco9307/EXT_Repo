@@ -6,8 +6,14 @@
 
 
 int main(int argc, char* argv[])
-{
-    int Delta_x{ atoi(argv[1]) }, Delta_y{ atoi(argv[2]) }, Delta_z{ atoi(argv[3]) };
+{   
+    int Delta_x{ 0 }, Delta_y{ 0 }, Delta_z{ 0 };
+
+    if (argc!=1){
+        Delta_x = atoi(argv[1]); 
+        Delta_y = atoi(argv[2]); 
+        Delta_z = atoi(argv[3]);
+    } 
 
     int shmid;
     int* array;
