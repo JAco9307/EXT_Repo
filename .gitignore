@@ -34,3 +34,4 @@
 #Compile specific files
 /OtherFiles/CLI
 /OtherFiles/MotorController
+/Joystick/calibval.txt
