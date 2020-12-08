@@ -33,7 +33,7 @@ int main() {
 
         MotorControl(JoystPos,CranePos); //All motor control in here
 
-        DumpVal(JoystPos,CranePos); //Dumps values to cout for debugging
+        //DumpVal(JoystPos,CranePos); //Dumps values to cout for debugging
 
         WriteToFile(JoystPos,CranePos);//Writes posistions to file for the webserver
 

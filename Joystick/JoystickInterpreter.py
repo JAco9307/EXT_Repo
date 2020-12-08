@@ -5,6 +5,7 @@ import serial.tools.list_ports
 import re
 import numpy as np
 import pickle
+import os
 
 ser = serial.Serial('/dev/ttyUSB0', 460800)
 if ser. isOpen:
@@ -130,7 +131,7 @@ while(True):
             else:
                 zout= 0
                 
-                
+        os.system("CLI " + str(int(xout)) + " " + str(int(yout)) + " " + str(int(zout)))
         time.sleep(0.005)
         
 
