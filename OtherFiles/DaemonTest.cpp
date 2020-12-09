@@ -4,6 +4,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h> 
 #include <wiringPi.h>
+#include <thread>
 
 using namespace std;
 #define EVER ;;
@@ -14,20 +15,29 @@ using namespace std;
 #define Motor2Pol 23
 #define Motor2Dir 22
 
-int Delay = 0;
+
+int Delay1 = 0, Delay2 = 0;
 void InitPins(void);
 void DefaultMemory(void);
 void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]);
-int SetMotor(int const &Pos, int Dir, int Motor);
+int SetMotor(int const &Pos, int Dir, int &Delay);
 void CopyMemory(int (&JoystPos)[3], int* const Recieve);
 void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]);
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]);
+
+void MotorThread(int Motor, int* Delay);
+void InitSteppers(void);
+
+thread Motor1(MotorThread, Motor1Pol, &Delay1);
+thread Motor2(MotorThread, Motor2Pol, &Delay2);
+
 
 int main() {
     //initializes memory to zero in case previous non zero persist
     DefaultMemory(); 
     wiringPiSetup();
     InitPins();
+    InitSteppers();
     
     //Initialize variables
     int* Recieve;
@@ -48,7 +58,7 @@ int main() {
 
         MotorControl(JoystPos,CranePos); //All motor control in here
 
-        //DumpVal(JoystPos,CranePos); //Dumps values to cout for debugging
+        DumpVal(JoystPos,CranePos); //Dumps values to cout for debugging
     }
 
     shmdt((void*)Recieve);
@@ -90,38 +100,39 @@ void CopyMemory(int (&JoystPos)[3], int* const Recieve){
 
 
 void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]){
-    CranePos[0] += SetMotor(JoystPos[0], Motor1Dir, Motor1Pol);
-    CranePos[1] += SetMotor(JoystPos[1], Motor2Dir, Motor2Pol);
+    CranePos[0] += SetMotor(JoystPos[0], Motor1Dir, Delay1);
+    CranePos[1] += SetMotor(JoystPos[1], Motor2Dir, Delay2);
 } 
 
 void InitSteppers(){
-    thread Motor1(MotorThread)
+    
 }
 
-int SetMotor(int const &Pos, int Dir, int Motor){
+int SetMotor(int const &Pos, int Dir, int &Delay){
     if(Pos >= 50 || Pos <= -50){
         if(Pos < 0) digitalWrite(Dir, HIGH);
         else digitalWrite(Dir, LOW);
-        int Speed = abs(Pos);
-        int Del = ((250-Speed)*10);
-        int Exec = 50000/(2*Del);
-        int Steps = Exec;
 
-        cout << endl;
-        if(Pos > 0) return Steps;
-        else return -Steps;
+        int Speed = abs(Pos);
+        Delay = ((250-Speed)*10);
+        int Exec = 5000/(2*Delay);
+
+        if(Pos > 0) return Exec;
+        else return -Exec;
     }
-    delayMicroseconds(50000);
+    delayMicroseconds(5000);
     return 0;
 }
 
-void MotorThread(int Motor){
+void MotorThread(int Motor, int* Delay){
     for(EVER){
-        if(Delay < 300) delayMicroseconds(300); //in case something does wrong it wont overheat the cpu
-        digitalWrite(Motor, HIGH);
-        delayMicroseconds(Delay);
-        digitalWrite(Motor, LOW);
-        delayMicroseconds(Delay);
+        if(*Delay > 300 && *Delay < 5000 ){
+            digitalWrite(Motor, HIGH);
+            delayMicroseconds(*Delay);
+            digitalWrite(Motor, LOW);
+            delayMicroseconds(*Delay);
+        }
+        else delayMicroseconds(2000);
     }
 }
 
@@ -134,6 +145,6 @@ void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]){
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]){  
     std::ofstream ofs;
     ofs.open("../htdocs/CranePos.txt", std::ofstream::out | std::ofstream::trunc);
-    ofs << JoystPos[0] << ',' << JoystPos[1] << ',' << JoystPos[2] << ';' << CranePos[0]/4 << ',' << CranePos[1]/4 << ',' << CranePos[2];
+    ofs << JoystPos[0] << ',' << JoystPos[1] << ',' << JoystPos[2] << ';' << CranePos[0]/200 << ',' << CranePos[1]/200 << ',' << CranePos[2];
     ofs.close();
 }

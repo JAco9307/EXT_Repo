@@ -12,13 +12,12 @@ using namespace std;
 #define EVER ;;
 
 
-void ThreadTest(void);
+void ThreadTest(int* i);
 int i;
-std::thread thread_object(ThreadTest);
 
 int main(int argc, char* argv[])
 {
-    thread t1(ThreadTest);
+    thread t1(ThreadTest, &i);
     while(1){
         delayMicroseconds(500000);
         i++;
@@ -27,9 +26,9 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void ThreadTest(void){
+void ThreadTest(int* i){
     for(EVER){
-        cout << "\rthread access: " << i << flush;
+        cout << "\rthread access: " << *i << flush;
         delayMicroseconds(50000);
     }
 }
