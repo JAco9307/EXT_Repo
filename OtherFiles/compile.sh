@@ -1,1 +1,1 @@
-g++ -o MotorController DaemonTest.cpp -lwiringPi; g++ -o CLI ValueUpdate.cpp; echo "Done"; sudo mv CLI /usr/bin/ 
+g++ -o MotorController DaemonTest.cpp -lpthread -lwiringPi; g++ -o CLI ValueUpdate.cpp; echo "Done"; sudo mv CLI /usr/bin/ 

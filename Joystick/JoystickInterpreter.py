@@ -65,7 +65,7 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
     V[1] = (V[0]-Z[0])/grad
     #Dead zone and upper limit calculation
     if V[1] > (dead+deadzone) or V[1] < (dead-deadzone):
-        if V[1] >= 200:
+        if V[1] > 200:
             out = 200
             print(out)
         else:
