@@ -107,8 +107,8 @@ int SetMotor(int const &Pos, int Dir, int &Delay)
     if(Pos >= 50 || Pos <= -50){
         if(Pos < 0) digitalWrite(Dir, HIGH); //Set direction based on sign
         else digitalWrite(Dir, LOW);
-
-        Delay = ((250-abs(Pos))*10); //Calculate joystick posistion into step period
+        int speed = abs(Pos);
+        Delay = (((250-speed)*10/3)+333); //Calculate joystick posistion into step period
         int Exec = 5000/(2*Delay);   //Calculate the amount of steps taking during the delay
 
         if(Pos > 0) return Exec;
