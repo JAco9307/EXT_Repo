@@ -11,7 +11,7 @@ ser = serial.Serial('/dev/ttyUSB0', 460800)
 if ser. isOpen:
     print(ser.name + ' Comms open')
 
-    
+
 a=0
 b=0
 c=0
@@ -57,6 +57,39 @@ downvalavg = 0
 total = 0
 zout = 0
 
+def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone,)
+    resp = ser.readline()
+    res = resp.decode()
+    #this line takes only the integers from the stream response
+    box1 = [int(s) for s in re.findall(r'\d+', res)]
+    s1 = box1[1]
+    s2 = box1[3]
+    V[0] = s1-s2
+    V[1] = (V[0]-Z[0])/grad
+    #Dead zone calculation
+    if V[1] > (dead+deadzone) or V[1] < (dead-deadzone):
+        if V[1] > 200:
+            out = 200:
+            print(out)
+        else:
+            out = int(V[1])
+            print(out)
+    else:
+        out = 0
+        print(out)
+
+def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4)
+    if yO == 0 and xO == 0:
+        total = s1+s2+s3+s4
+        if total >= (0.75*upval):
+            zO = 1
+            print('UP')
+        elif total <= (1.25*downval):
+            zO = -1
+            print('DOWN')
+        else:
+            zO = 0
+
 while(True):
     try:
         if b <=0:
@@ -66,7 +99,7 @@ while(True):
             con=ser.readline()
             con = con.decode()
             print(con)
-            
+
             vals = pickle.load(open('calibval.txt', 'rb'))
             ymax[0] = vals[0]
             xmax[0] = vals[1]
@@ -85,64 +118,14 @@ while(True):
             time.sleep(0.005)
 
         else:
-            #main body
-            resp = ser.readline()
-            res = resp.decode()
-            #this line takes only the integers from the stream response
-            testres = [int(s) for s in re.findall(r'\d+', res)]
-            sensor1 = testres[1]
-            sensor2 = testres[3]
+            #Y axis Processing
+            StreamReader(testres,sensor1,sensor2,yvalue,yzero,ygrad,ydead,yout,deadZ)
+            #X axis Processing
+            StreamReader(testres,sensor3,sensor4,xvalue,xzero,xgrad,xdead,xout,deadZ)
+            #updown processing
+            UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
+
             
-            yvalue[0] = sensor1-sensor2
-            yvalue[1] = (yvalue[0]-yzero[0])/ygrad
-
-            #Y axis deadzone calculation
-            if yvalue[1] > (ydead+deadZ) or yvalue[1] < (ydead-deadZ):
-                if yvalue[1] > 200:
-                    yout = 200
-                    print(yout)
-                else:
-                    yout = int(yvalue[1])
-                    print(yout)
-            else:
-                yout = 0
-                print(yout)
-
-            #X axis processing
-            resp = ser.readline()
-            res = resp.decode()
-            testres =[int(s) for s in re.findall(r'\d+', res)]
-            sensor3 = testres[1]
-            sensor4 = testres[3]
-
-            xvalue[0] = sensor3-sensor4
-            xvalue[1] = (xvalue[0]-xzero[0])/xgrad
-            #X axis deadzone calculation
-            if xvalue[1] > (xdead+deadZ) or xvalue[1] < (xdead-deadZ):
-                if xvalue[1] > 200:
-                    xout = 200
-                    print(xout)
-                else:
-                    xout = int(xvalue[1])
-                    print(xout)
-            else:
-                
-                xout = 0
-                print(xout)
-
-
-            #updown processing    
-            if yout == 0 and xout == 0:
-                total = sensor1+sensor2+sensor3+sensor4
-                if total >= (0.75*upvalavg):
-                    zout = 1
-                    print('UP')
-                elif total <= (1.25*downvalavg):
-                    zout = -1
-                    print('DOWN')
-                else:
-                    zout= 0
-                    
             os.system("CLI " + str(int(xout)) + " " + str(int(yout)) + " " + str(int(zout)))
             time.sleep(0.005)
     except KeyboardInterrupt:
@@ -151,10 +134,3 @@ while(True):
         resp = ser.readline()
         print("\n *** Exit Seq *** \n")
         sys.exit()
-            
-
-       
-
-    
-    
-    
