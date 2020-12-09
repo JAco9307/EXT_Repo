@@ -54,7 +54,7 @@ int main() {
 
         MotorControl(JoystPos,CranePos); //All motor control in here
 
-        DumpVal(JoystPos,CranePos); //Dumps values to cout for debugging
+        //DumpVal(JoystPos,CranePos); //Dumps values to cout for debugging
 
         delayMicroseconds(5000);
     }
@@ -100,6 +100,8 @@ void CopyMemory(int (&JoystPos)[3], int* const Recieve){
 void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]){
     CranePos[0] += SetMotor(JoystPos[0], Motor1Dir, Delay1);
     CranePos[1] += SetMotor(JoystPos[1], Motor2Dir, Delay2);
+    cout << "Delay M1: " << " " << Delay1 << endl;
+    cout << "Delay M2: " << " " << Delay2 << endl;
 } 
 
 int SetMotor(int const &Pos, int Dir, int &Delay)
@@ -113,6 +115,8 @@ int SetMotor(int const &Pos, int Dir, int &Delay)
 
         if(Pos > 0) return Exec;
         else return -Exec;
+    }else{
+        Delay = 0;
     }
     return 0;
 }
