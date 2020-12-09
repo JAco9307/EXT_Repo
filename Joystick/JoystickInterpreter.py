@@ -13,9 +13,6 @@ if ser. isOpen:
 
 
 a=0
-b=0
-c=0
-d=0
 sensor1 = 0
 sensor2 = 0
 sensor3 = 0
@@ -66,7 +63,7 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
     s2 = box1[3]
     V[0] = s1-s2
     V[1] = (V[0]-Z[0])/grad
-    #Dead zone calculation
+    #Dead zone and upper limit calculation
     if V[1] > (dead+deadzone) or V[1] < (dead-deadzone):
         if V[1] > 200:
             out = 200
@@ -92,14 +89,13 @@ def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
 
 while(True):
     try:
-        if b <=0:
+        if a <=0:
             #initial setup. cleaning buffers, reading STREAM confirmation, accepting values from autocalibrator
             ser.reset_output_buffer()
             ser.reset_input_buffer()
             con=ser.readline()
             con = con.decode()
             print(con)
-
             vals = pickle.load(open('calibval.txt', 'rb'))
             ymax[0] = vals[0]
             xmax[0] = vals[1]
@@ -113,8 +109,7 @@ while(True):
             xdead = vals[9]
             upvalavg = vals[10]
             downvalavg = vals[11]
-
-            b+=1
+            a+=1
             time.sleep(0.005)
 
         else:
@@ -124,10 +119,10 @@ while(True):
             StreamReader(testres,sensor3,sensor4,xvalue,xzero,xgrad,xdead,xout,deadZ)
             #updown processing
             UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
-
-            
+            #sending to the controller
             os.system("CLI " + str(int(xout)) + " " + str(int(yout)) + " " + str(int(zout)))
             time.sleep(0.005)
+
     except KeyboardInterrupt:
         os.system("CLI")
         ser.write(nostrm.encode())
