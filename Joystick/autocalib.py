@@ -57,13 +57,13 @@ downvallist = [0]
 upvalavg = 0
 downvalavg = 0
 
-def ZeroFinder(box1,s1,s2,s1avg,s2avg,V,Z,checker,range):
+def ZeroFinder(box1,s1,s2,s1avg,s2avg,V,Z,checker,rang):
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
     resp = ser.readline()
 
-    for x in range(range):
+    for x in range(rang):
         resp = ser.readline()
         res = resp.decode()
         box1 = [int(s) for s in re.findall(r'\d+', res)]
@@ -71,8 +71,8 @@ def ZeroFinder(box1,s1,s2,s1avg,s2avg,V,Z,checker,range):
         s2.append(box1[3])
         resp = ser.readline()
 
-    s1avg = sum(s1)/range
-    s2avg = sum(s1)/range
+    s1avg = sum(s1)/rang
+    s2avg = sum(s1)/rang
     V[0] = s1avg-s2avg
     Z[0] = V[0]
     checker = 0
@@ -82,13 +82,13 @@ def ZeroFinder(box1,s1,s2,s1avg,s2avg,V,Z,checker,range):
     s2 = [0]
     time.sleep(0.005)
 
-def YMaxMinFinder(box1,s1,s2,s1avg,s2avg,V,maxmin,checker,range):
+def YMaxMinFinder(box1,s1,s2,s1avg,s2avg,V,maxmin,checker,rang):
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
     resp = ser.readline()
 
-    for x in range(range):
+    for x in range(rang):
         resp = ser.readline()
         res = resp.decode()
         box1 = [int(s) for s in re.findall(r'\d+', res)]
@@ -96,8 +96,8 @@ def YMaxMinFinder(box1,s1,s2,s1avg,s2avg,V,maxmin,checker,range):
         s2.append(box1[3])
         resp = ser.readline()
 
-    s1avg = sum(s1)/range
-    s2avg = sum(s1)/range
+    s1avg = sum(s1)/rang
+    s2avg = sum(s1)/rang
     V[0] = s1avg-s2avg
     maxmin[0] = V[0]
     checker = 0
@@ -107,13 +107,13 @@ def YMaxMinFinder(box1,s1,s2,s1avg,s2avg,V,maxmin,checker,range):
     s2 = [0]
     time.sleep(0.005)
 
-def XMaxMinFinder(box1,s1,s2,s1avg,s2avg,V,maxmin,checker,range):
+def XMaxMinFinder(box1,s1,s2,s1avg,s2avg,V,maxmin,checker,rang):
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
     resp = ser.readline()
 
-    for x in range(range):
+    for x in range(rang):
         resp = ser.readline()
         resp = ser.readline()
         res = resp.decode()
@@ -121,8 +121,8 @@ def XMaxMinFinder(box1,s1,s2,s1avg,s2avg,V,maxmin,checker,range):
         s1.append(box1[1])
         s2.append(box1[3])
 
-    s1avg = sum(s1)/range
-    s2avg = sum(s1)/range
+    s1avg = sum(s1)/rang
+    s2avg = sum(s1)/rang
     V[0] = s1avg-s2avg
     maxmin[0] = V[0]
     checker = 0
@@ -132,7 +132,7 @@ def XMaxMinFinder(box1,s1,s2,s1avg,s2avg,V,maxmin,checker,range):
     s2 = [0]
     time.sleep(0.005)
 
-def DeadzoneFinder(box1,s1,s2,s3,s4,s1avg,s2avg,s3avg,s4avg,YV,XV,YZ,XZ,Ygrad,Xgrad,YavgZ,XavgZ,range):
+def DeadzoneFinder(box1,s1,s2,s3,s4,s1avg,s2avg,s3avg,s4avg,YV,XV,YZ,XZ,Ygrad,Xgrad,YavgZ,XavgZ,rang):
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
@@ -150,10 +150,10 @@ def DeadzoneFinder(box1,s1,s2,s3,s4,s1avg,s2avg,s3avg,s4avg,YV,XV,YZ,XZ,Ygrad,Xg
         s3.append(box1[1])
         s4.append(box1[3])
 
-    s1avg = (sum(s1))/(range)
-    s2avg = (sum(s2))/(range)
-    s3avg = (sum(s3))/(range)
-    s4avg = (sum(s4))/(range)
+    s1avg = (sum(s1))/(rang)
+    s2avg = (sum(s2))/(rang)
+    s3avg = (sum(s3))/(rang)
+    s4avg = (sum(s4))/(rang)
     YV[0] = s1avg-s2avg
     XV[0] = s3avg-s4avg
     YV[1] = (YV[0]-YZ[0])/Ygrad
@@ -181,11 +181,12 @@ while(True):
     YMaxMinFinder(testres,sensor1,sensor2,sensor1avg,sensor2avg,yvalue,ymin,checker,rng)
 
     checker = input('Set X MIN')
-    XMaxMinFinder(testres,sensor3,sensor4,sensor3avg,sensor4avg,xvalue,xmax,checker,rng)
+    XMaxMinFinder(testres,sensor3,sensor4,sensor3avg,sensor4avg,xvalue,xmin,checker,rng)
 
     ygrad = (ymax[0]-ymin[0])/fullgrad
     xgrad = (xmax[0]-xmin[0])/fullgrad
-
+    print(ymax[0])
+    print(ymin[0])
     checker = input('Calculate DEADZONE')
     DeadzoneFinder(testres,sensor1,sensor2,sensor3,sensor4,sensor1avg,sensor2avg,sensor3avg,sensor4avg,yvalue,xvalue,yzero,xzero,ygrad,xgrad,yavgzero,xavgzero,rng)
 
