@@ -68,12 +68,17 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
         if V[1] > 200:
             out = 200
             print(out)
+        elif V[1] < -200:
+            out = -200
+            print(out)
         else:
             out = int(V[1])
             print(out)
     else:
         out = 0
         print(out)
+
+    return out
 
 def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
     if yO == 0 and xO == 0:
@@ -114,13 +119,13 @@ while(True):
 
         else:
             #Y axis Processing
-            StreamReader(testres,sensor1,sensor2,yvalue,yzero,ygrad,ydead,yout,deadZ)
+            yout = StreamReader(testres,sensor1,sensor2,yvalue,yzero,ygrad,ydead,yout,deadZ)
             #X axis Processing
-            StreamReader(testres,sensor3,sensor4,xvalue,xzero,xgrad,xdead,xout,deadZ)
+            xout = StreamReader(testres,sensor3,sensor4,xvalue,xzero,xgrad,xdead,xout,deadZ)
             #updown processing
             UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
             #sending to the controller
-            os.system("CLI " + str(int(xout)) + " " + str(int(yout)) + " " + str(int(zout)))
+            os.system("CLI " + str(xout) + " " + str(yout) + " " + str(int(zout)))
             time.sleep(0.005)
 
     except KeyboardInterrupt:
