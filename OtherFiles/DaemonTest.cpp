@@ -14,6 +14,8 @@ using namespace std;
 #define Motor2Pol 23
 #define Motor2Dir 22
 
+int Delay = 0;
+void InitPins(void);
 void DefaultMemory(void);
 void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]);
 int SetMotor(int const &Pos, int Dir, int Motor);
@@ -25,10 +27,7 @@ int main() {
     //initializes memory to zero in case previous non zero persist
     DefaultMemory(); 
     wiringPiSetup();
-    pinMode(Motor1Pol,OUTPUT);
-    pinMode(Motor1Dir,OUTPUT);
-    pinMode(Motor2Pol,OUTPUT);
-    pinMode(Motor2Dir,OUTPUT);
+    InitPins();
     
     //Initialize variables
     int* Recieve;
@@ -57,6 +56,13 @@ int main() {
     return 0;
 }
 
+void InitPins(void){
+    pinMode(Motor1Pol,OUTPUT);
+    pinMode(Motor1Dir,OUTPUT);
+    pinMode(Motor2Pol,OUTPUT);
+    pinMode(Motor2Dir,OUTPUT);
+}
+
 void DefaultMemory() {
     int shmid;
     int* array;
@@ -71,9 +77,7 @@ void DefaultMemory() {
 	if (array == reinterpret_cast<void*>(-1)) {
 		perror("Could not get shared memory location");
 	}
-    array[0] = 0;
-    array[1] = 0;
-    array[2] = 0;
+    array = 0, 0, 0;
 
     shmdt((void*)array);
 }
@@ -90,6 +94,10 @@ void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]){
     CranePos[1] += SetMotor(JoystPos[1], Motor2Dir, Motor2Pol);
 } 
 
+void InitSteppers(){
+    thread Motor1(MotorThread)
+}
+
 int SetMotor(int const &Pos, int Dir, int Motor){
     if(Pos >= 50 || Pos <= -50){
         if(Pos < 0) digitalWrite(Dir, HIGH);
@@ -98,19 +106,23 @@ int SetMotor(int const &Pos, int Dir, int Motor){
         int Del = ((250-Speed)*10);
         int Exec = 50000/(2*Del);
         int Steps = Exec;
-        cout << "Delay: " << Del << " Exec: " << Exec << endl;
-        while (Exec-->0){
-            cout << "\rExec:" << Exec << flush;
-            digitalWrite(Motor, HIGH);
-            delayMicroseconds(Del);
-            digitalWrite(Motor, LOW);
-            delayMicroseconds(Del);
-        }
+
         cout << endl;
         if(Pos > 0) return Steps;
         else return -Steps;
     }
+    delayMicroseconds(50000);
     return 0;
+}
+
+void MotorThread(int Motor){
+    for(EVER){
+        if(Delay < 300) delayMicroseconds(300); //in case something does wrong it wont overheat the cpu
+        digitalWrite(Motor, HIGH);
+        delayMicroseconds(Delay);
+        digitalWrite(Motor, LOW);
+        delayMicroseconds(Delay);
+    }
 }
 
 void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]){
