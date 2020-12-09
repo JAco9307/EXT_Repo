@@ -57,7 +57,7 @@ downvalavg = 0
 total = 0
 zout = 0
 
-def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone,)
+def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
     resp = ser.readline()
     res = resp.decode()
     #this line takes only the integers from the stream response
@@ -69,7 +69,7 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone,)
     #Dead zone calculation
     if V[1] > (dead+deadzone) or V[1] < (dead-deadzone):
         if V[1] > 200:
-            out = 200:
+            out = 200
             print(out)
         else:
             out = int(V[1])
@@ -78,7 +78,7 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone,)
         out = 0
         print(out)
 
-def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4)
+def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
     if yO == 0 and xO == 0:
         total = s1+s2+s3+s4
         if total >= (0.75*upval):

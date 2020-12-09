@@ -59,19 +59,29 @@
 			maintainAspectRatio: false,
 			scales: {
 				yAxes: [{
+					gridLines:{
+						drawTicks: false
+					},
 					ticks: {
 						beginAtZero: false,
-						suggestedMin: -300,
-						suggestedMax: 300,
-						stepSize: 20
+						suggestedMin: -200,
+						suggestedMax: 200,
+						stepSize: 10,
+						display: false,
+						drawBorder: false
 					}
 				}],
 				xAxes: [{
+					gridLines:{
+						drawTicks: false
+					},
 					ticks: {
 						beginAtZero: false,
-						suggestedMin: -300,
-						suggestedMax: 300,
-						stepSize: 20
+						suggestedMin: -200,
+						suggestedMax: 200,
+						stepSize: 10,
+						display: false,
+						drawBorder: false
 					}
 				}]
 			}
@@ -137,17 +147,17 @@
 				yAxes: [{
 					ticks: {
 						beginAtZero: true,
-						suggestedMin: 1000,
-						suggestedMax: 1000,
-						stepSize: 25
+						suggestedMin: 0,
+						suggestedMax: 500,
+						stepSize: 10,
 					}
 				}],
 				xAxes: [{
 					ticks: {
 						beginAtZero: true,
-						suggestedMin: 1000,
-						suggestedMax: 1000,
-						stepSize: 25
+						suggestedMin: 0,
+						suggestedMax: 500,
+						stepSize: 10,
 					}
 				}]
 			}

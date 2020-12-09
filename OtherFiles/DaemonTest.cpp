@@ -26,18 +26,14 @@ void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]);
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]);
 
 void MotorThread(int Motor, int* Delay);
-void InitSteppers(void);
 
-thread Motor1(MotorThread, Motor1Pol, &Delay1);
-thread Motor2(MotorThread, Motor2Pol, &Delay2);
-
+thread Motor1(MotorThread, Motor1Pol, &Delay1); //Motor1 thread 
+thread Motor2(MotorThread, Motor2Pol, &Delay2); //Motor1 thread 
 
 int main() {
-    //initializes memory to zero in case previous non zero persist
-    DefaultMemory(); 
-    wiringPiSetup();
-    InitPins();
-    InitSteppers();
+    DefaultMemory(); //initializes memory to zero in case previous non zero persist
+    wiringPiSetup(); //Initializes pin usage
+    InitPins();      //Initializes used pins
     
     //Initialize variables
     int* Recieve;
@@ -59,6 +55,8 @@ int main() {
         MotorControl(JoystPos,CranePos); //All motor control in here
 
         DumpVal(JoystPos,CranePos); //Dumps values to cout for debugging
+
+        delayMicroseconds(5000);
     }
 
     shmdt((void*)Recieve);
@@ -104,29 +102,24 @@ void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]){
     CranePos[1] += SetMotor(JoystPos[1], Motor2Dir, Delay2);
 } 
 
-void InitSteppers(){
-    
-}
-
-int SetMotor(int const &Pos, int Dir, int &Delay){
+int SetMotor(int const &Pos, int Dir, int &Delay)
+{
     if(Pos >= 50 || Pos <= -50){
-        if(Pos < 0) digitalWrite(Dir, HIGH);
+        if(Pos < 0) digitalWrite(Dir, HIGH); //Set direction based on sign
         else digitalWrite(Dir, LOW);
 
-        int Speed = abs(Pos);
-        Delay = ((250-Speed)*10);
-        int Exec = 5000/(2*Delay);
+        Delay = ((250-abs(Pos))*10); //Calculate joystick posistion into step period
+        int Exec = 5000/(2*Delay);   //Calculate the amount of steps taking during the delay
 
         if(Pos > 0) return Exec;
         else return -Exec;
     }
-    delayMicroseconds(5000);
     return 0;
 }
 
 void MotorThread(int Motor, int* Delay){
     for(EVER){
-        if(*Delay > 300 && *Delay < 5000 ){
+        if(*Delay > 300 && *Delay < 5000 ){ // Saftety net if the Delay is out of range 
             digitalWrite(Motor, HIGH);
             delayMicroseconds(*Delay);
             digitalWrite(Motor, LOW);
