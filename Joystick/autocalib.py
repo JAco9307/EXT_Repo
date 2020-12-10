@@ -5,7 +5,7 @@ import serial.tools.list_ports
 import re
 import numpy as np
 import pickle
-
+#push test
 ser = serial.Serial('/dev/ttyUSB0', 460800)
 if ser. isOpen:
     print(ser.name + ' Comms open')
