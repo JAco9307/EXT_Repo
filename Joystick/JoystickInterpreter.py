@@ -1,4 +1,3 @@
-
 import serial
 import time
 import serial.tools.list_ports
@@ -53,7 +52,6 @@ upvalavg = 0
 downvalavg = 0
 total = 0
 zout = 0
-polarity = 0
 
 def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
     resp = ser.readline()
@@ -84,25 +82,14 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
 def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
     if yO == 0 and xO == 0:
         total = s1+s2+s3+s4
-        if polarity == 1:
-            if total > (0.75*upval):
-                zO = 1
-                print('UP')
-            elif total < (1.25*downval):
-                zO = -1
-                print('DOWN')
-            else:
-                zO = 0
-        elif polarity == 0:
-            if total < (1.25*upval):
-                zO = 1
-                print('UP')
-            elif total > (0.75*downval):
-                zO = -1
-                print('DOWN')
-            else:
-                zO = 0
-    return zO
+        if total >= (0.75*upval):
+            zO = 1
+            print('UP')
+        elif total <= (1.25*downval):
+            zO = -1
+            print('DOWN')
+        else:
+            zO = 0
 
 while(True):
     try:
@@ -126,7 +113,6 @@ while(True):
             xdead = vals[9]
             upvalavg = vals[10]
             downvalavg = vals[11]
-            polarity = vals[12]
             a+=1
             time.sleep(0.005)
 
@@ -136,7 +122,7 @@ while(True):
             #X axis Processing
             xout = StreamReader(testres,sensor3,sensor4,xvalue,xzero,xgrad,xdead,xout,deadZ)
             #updown processing
-            zout = UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
+            UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
             #sending to the controller
             os.system("CLI " + str(xout) + " " + str(yout) + " " + str(int(zout)))
             time.sleep(0.005)
