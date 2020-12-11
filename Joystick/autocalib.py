@@ -59,59 +59,6 @@ downvalavg = 0
 
 while(True):
 
-    checker = input('Set Y ZERO')
-    ser.reset_output_buffer()
-    ser.reset_input_buffer()
-    ser.write(strm.encode())
-    resp = ser.readline()
-
-    for x in range(rng):
-        resp = ser.readline()
-        res = resp.decode()
-        testres = [int(s) for s in re.findall(r'\d+', res)]
-        sensor1.append(testres[1])
-        sensor2.append(testres[3])
-        resp = ser.readline()
-
-    sensor1avg = sum(sensor1)/rng
-    sensor2avg = sum(sensor2)/rng
-
-    yvalue[0] = sensor1avg - sensor2avg
-    yzero[0] = yvalue[0]
-    checker = 0
-    ser.write(nostrm.encode())
-    resp = ser.readline()
-    sensor1 = [0]
-    sensor2 = [0]
-    time.sleep(0.005)
-
-
-    checker = input('Set X ZERO')
-    ser.reset_output_buffer()
-    ser.reset_input_buffer()
-    ser.write(strm.encode())
-    resp = ser.readline()
-
-    for x in range(rng):
-        resp = ser.readline()
-        resp = ser.readline()
-        res = resp.decode()
-        testres = [int(s) for s in re.findall(r'\d+', res)]
-        sensor3.append(testres[1])
-        sensor4.append(testres[3])
-
-    sensor3avg = sum(sensor3)/rng
-    sensor4avg = sum(sensor4)/rng
-
-    xvalue[0] = sensor3avg - sensor4avg
-    xzero[0] = xvalue[0]
-    checker = 0
-    ser.write(nostrm.encode())
-    resp = ser.readline()
-    sensor3 = [0]
-    sensor4 = [0]
-    time.sleep(0.005)
-
     checker = input('Set Y MAX')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
@@ -209,6 +156,59 @@ while(True):
 
     xvalue[0] = sensor3avg - sensor4avg
     xmin[0] = xvalue[0]
+    checker = 0
+    ser.write(nostrm.encode())
+    resp = ser.readline()
+    sensor3 = [0]
+    sensor4 = [0]
+    time.sleep(0.005)
+
+    checker = input('Set Y ZERO')
+    ser.reset_output_buffer()
+    ser.reset_input_buffer()
+    ser.write(strm.encode())
+    resp = ser.readline()
+
+    for x in range(rng):
+        resp = ser.readline()
+        res = resp.decode()
+        testres = [int(s) for s in re.findall(r'\d+', res)]
+        sensor1.append(testres[1])
+        sensor2.append(testres[3])
+        resp = ser.readline()
+
+    sensor1avg = sum(sensor1)/rng
+    sensor2avg = sum(sensor2)/rng
+
+    yvalue[0] = sensor1avg - sensor2avg
+    yzero[0] = yvalue[0]
+    checker = 0
+    ser.write(nostrm.encode())
+    resp = ser.readline()
+    sensor1 = [0]
+    sensor2 = [0]
+    time.sleep(0.005)
+
+
+    checker = input('Set X ZERO')
+    ser.reset_output_buffer()
+    ser.reset_input_buffer()
+    ser.write(strm.encode())
+    resp = ser.readline()
+
+    for x in range(rng):
+        resp = ser.readline()
+        resp = ser.readline()
+        res = resp.decode()
+        testres = [int(s) for s in re.findall(r'\d+', res)]
+        sensor3.append(testres[1])
+        sensor4.append(testres[3])
+
+    sensor3avg = sum(sensor3)/rng
+    sensor4avg = sum(sensor4)/rng
+
+    xvalue[0] = sensor3avg - sensor4avg
+    xzero[0] = xvalue[0]
     checker = 0
     ser.write(nostrm.encode())
     resp = ser.readline()
