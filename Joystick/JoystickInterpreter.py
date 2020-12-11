@@ -82,14 +82,15 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
 def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
     if yO == 0 and xO == 0:
         total = s1+s2+s3+s4
-        if total >= (0.75*upval):
+        if total < (upval):
             zO = 1
             print('UP')
-        elif total <= (1.25*downval):
+        elif total > (downval):
             zO = -1
             print('DOWN')
         else:
             zO = 0
+    return zO
 
 while(True):
     try:
@@ -122,7 +123,7 @@ while(True):
             #X axis Processing
             xout = StreamReader(testres,sensor3,sensor4,xvalue,xzero,xgrad,xdead,xout,deadZ)
             #updown processing
-            UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
+            zout = UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
             #sending to the controller
             os.system("CLI " + str(xout) + " " + str(yout) + " " + str(int(zout)))
             time.sleep(0.005)
