@@ -12,36 +12,35 @@
 using namespace std;
 
 #define Motor1Pol 1
+#define Motor1En 8
 #define Motor1Dir 16
 
 #define Motor2Pol 23
+#define Motor2En 9
 #define Motor2Dir 22
 
 #define EVER ;;
 
-int dirx = 0, diry = 0;
-int delpointing1, delpointing2;
-static int* del1 = &delpointing1;
-static int* del2 = &delpointing2;
-
-void MotorThread(int Motor, int* Delay);
-
+int dirx = -1, diry = -1;
+int del1 = 0, del2 = 0;
+int stepxp = 0, stepyp = 0;
+//static int* del1 = &delpointing1;
+//static int* del2 = &delpointing2;
 
 
-void ThreadTest(int* i);
+void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir);
+
+void PinSetup(void);
 
 
 int main(int argc, char* argv[])
 {
     wiringPiSetup();
-    pinMode(Motor1Pol,OUTPUT);
-    pinMode(Motor1Dir,OUTPUT);
-    pinMode(Motor2Pol,OUTPUT);
-    pinMode(Motor2Dir,OUTPUT);
-    *del1 = atoi(argv[1]);
-    *del2 = atoi(argv[2]);
-    thread Motor1(MotorThread, Motor1Pol, &dirx); //Motor1 thread 
-    thread Motor2(MotorThread, Motor2Pol, &diry); //Motor1 thread 
+    PinSetup();
+    del1 = atoi(argv[1]);
+    del2 = atoi(argv[2]);
+    thread Motor1(MotorThread, Motor1Pol, Motor1En, Motor1Dir, 5000, 0, &stepxp, &dirx); //Motor1 thread 
+    thread Motor2(MotorThread, Motor2Pol, Motor2En, Motor2Dir, 3200, 0, &stepyp, &diry); //Motor1 thread 
     initscr(); //remember about errors support
     
 
@@ -50,43 +49,73 @@ int main(int argc, char* argv[])
         switch(c) {
         case 65:
             dirx = 1;
-            digitalWrite(Motor1Dir, LOW);
+            
             break;
         case 66:
-            dirx = 1;
-            digitalWrite(Motor1Dir, HIGH);
+            dirx = 0;
+            
             break;
         case 67:
             diry = 1;
-            digitalWrite(Motor2Dir, LOW);
+            
             break;
         case 68:
-            diry = 1;
-            digitalWrite(Motor2Dir, HIGH);
+            diry = 0;
+            
             break;
-        
         case '\r':
-            diry=0;
-            dirx=0;
-            cout << "Enter" << endl;
+            digitalWrite(Motor1En, HIGH);
+            digitalWrite(Motor2En, HIGH);
+            dirx = -1;
+            diry = -1;
             break;
         }
-        //cout << "\rdirx: " << dirx << " diry: " << diry << flush;
+        cout << "\rStepx: " << stepxp << " stepy: " << stepyp << endl;
+        cout << "\rDirx: " << dirx << " Diry: " << diry << endl;
     }
     return 0;
 }
 
-
-void MotorThread(int Motor, int* Delay){
+void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir){
     for(EVER){
-        if(*Delay != 0 ){
-            int OnDelay = *del1;
-            int OffDelay = *del2;
-            digitalWrite(Motor, HIGH);
-            delayMicroseconds(OnDelay);
-            digitalWrite(Motor, LOW);
-            delayMicroseconds(OffDelay);
+        if(*dir == 1){
+            digitalWrite(MotorDir, HIGH);
+            if (++(*Steps) >= RangeTop)
+            {
+                *Steps =  RangeTop;
+                digitalWrite(enable, HIGH);
+            }
+            else{
+                digitalWrite(enable, LOW);
+                digitalWrite(Motor, HIGH);
+                delayMicroseconds(del1);
+                digitalWrite(Motor, LOW);
+                delayMicroseconds(del2);
+            }
         }
-        else delayMicroseconds(10000);
+        else if(*dir == 0){
+            digitalWrite(MotorDir, LOW);
+            if (--(*Steps) <= RangeBot)
+            {
+                *Steps =  RangeBot;
+                digitalWrite(enable, HIGH);
+            }
+            else{
+                digitalWrite(enable, LOW);
+                digitalWrite(Motor, HIGH);
+                delayMicroseconds(del1);
+                digitalWrite(Motor, LOW);
+                delayMicroseconds(del2);
+            }
+        }        
     }
+}
+
+void PinSetup(void){
+    pinMode(Motor1Pol,OUTPUT);
+    pinMode(Motor1Dir,OUTPUT);
+    pinMode(Motor2Pol,OUTPUT);
+    pinMode(Motor2Dir,OUTPUT);
+    pinMode(Motor1En,OUTPUT);
+    pinMode(Motor2En,OUTPUT);
 }
