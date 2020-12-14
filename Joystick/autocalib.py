@@ -56,6 +56,7 @@ upvallist = [0]
 downvallist = [0]
 upvalavg = 0
 downvalavg = 0
+polarity = 0
 
 while(True):
 
@@ -163,7 +164,7 @@ while(True):
     sensor4 = [0]
     time.sleep(0.005)
 
-    checker = input('Set Y ZERO')
+    checker = input('Please Do Not Touch the Joystick')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
@@ -189,8 +190,6 @@ while(True):
     sensor2 = [0]
     time.sleep(0.005)
 
-
-    checker = input('Set X ZERO')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
@@ -216,7 +215,6 @@ while(True):
     sensor4 = [0]
     time.sleep(0.005)
 
-    checker = input('Calculate DEADZONE')
     ygrad = (ymax[0]-ymin[0])/fullgrad
     xgrad = (xmax[0]-xmin[0])/fullgrad
     ser.reset_output_buffer()
@@ -319,18 +317,20 @@ while(True):
     sensor2 = [0]
     sensor3 = [0]
     sensor4 = [0]
+
+    if upvalavg>downvalavg:
+        polarity = 1
+    else:
+        polarity = 0
+
     time.sleep(0.005)
 
     file = open('calibval.txt','wb')
-    memory = [ymax[0], xmax[0], ymin[0], xmin[0], yzero[0], xzero[0], ygrad, xgrad, yavgzero, xavgzero, upvalavg, downvalavg]
+    memory = [ymax[0], xmax[0], ymin[0], xmin[0], yzero[0], xzero[0], ygrad, xgrad, yavgzero, xavgzero, upvalavg, downvalavg, polarity]
     memory = [round(num) for num in memory]
     print(memory)
     pickle.dump(memory,file)
     file.close()
     print('Exported!')
-
-
     e+=1
-
-
     sys.exit()
