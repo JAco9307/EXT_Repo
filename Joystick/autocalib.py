@@ -60,7 +60,7 @@ polarity = 0
 
 while(True):
 
-    checker = input('Hold joystick forward')
+    checker = input('Set Y MAX')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
@@ -86,7 +86,7 @@ while(True):
     sensor2 = [0]
     time.sleep(0.005)
 
-    checker = input('Hold joystick right')
+    checker = input('Set X MAX')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
@@ -112,7 +112,7 @@ while(True):
     sensor4 = [0]
     time.sleep(0.005)
 
-    checker = input('Hold joystick back')
+    checker = input('Set Y MIN')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
@@ -138,7 +138,7 @@ while(True):
     sensor2 = [0]
     time.sleep(0.005)
 
-    checker = input('Hold joystick left')
+    checker = input('Set X MIN')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
@@ -164,7 +164,7 @@ while(True):
     sensor4 = [0]
     time.sleep(0.005)
 
-    checker = input('Please do not touch the joystick')
+    checker = input('Please Do Not Touch the Joystick')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     ser.write(strm.encode())
@@ -251,6 +251,7 @@ while(True):
     ser.write(nostrm.encode())
     resp = ser.readline()
 
+    checker = input('Find UP value')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     sensor1=[0]
@@ -284,7 +285,7 @@ while(True):
     sensor4 = [0]
     time.sleep(0.005)
 
-    checker = input('Push joystick down slightly')
+    checker = input('Find DOWN value')
     ser.reset_output_buffer()
     ser.reset_input_buffer()
     sensor1=[0]
