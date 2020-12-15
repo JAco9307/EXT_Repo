@@ -76,6 +76,14 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+void TakeStep(int enable, int motor){
+    digitalWrite(enable, LOW);
+    digitalWrite(motor, HIGH);
+    delayMicroseconds(del1);
+    digitalWrite(motor, LOW);
+    delayMicroseconds(del2);
+}
+
 void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir){
     for(EVER){
         if(*dir == 1){
@@ -86,11 +94,7 @@ void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot
                 digitalWrite(enable, HIGH);
             }
             else{
-                digitalWrite(enable, LOW);
-                digitalWrite(Motor, HIGH);
-                delayMicroseconds(del1);
-                digitalWrite(Motor, LOW);
-                delayMicroseconds(del2);
+                TakeStep(enable, Motor);
             }
         }
         else if(*dir == 0){
@@ -101,11 +105,7 @@ void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot
                 digitalWrite(enable, HIGH);
             }
             else{
-                digitalWrite(enable, LOW);
-                digitalWrite(Motor, HIGH);
-                delayMicroseconds(del1);
-                digitalWrite(Motor, LOW);
-                delayMicroseconds(del2);
+                TakeStep(enable, Motor);
             }
         }        
     }
