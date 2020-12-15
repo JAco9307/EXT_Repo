@@ -10,25 +10,25 @@ using namespace std;
 #define EVER ;;
 
 #define Motor1Pol 1
+#define Motor1En 8
 #define Motor1Dir 16
 
 #define Motor2Pol 23
+#define Motor2En 9
 #define Motor2Dir 22
 
-
 int Delay1 = 0, Delay2 = 0;
+int dirx = -1, diry = -1;
+
 void InitPins(void);
 void DefaultMemory(void);
 void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]);
-int SetMotor(int const &Pos, int Dir, int &Delay);
+void SetMotor(int const &Pos, int &Dir, int &Delay);
 void CopyMemory(int (&JoystPos)[3], int* const Recieve);
 void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]);
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]);
 
-void MotorThread(int Motor, int* Delay);
-
-thread Motor1(MotorThread, Motor1Pol, &Delay1); //Motor1 thread 
-thread Motor2(MotorThread, Motor2Pol, &Delay2); //Motor1 thread 
+void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir, int* delay);
 
 int main() {
     DefaultMemory(); //initializes memory to zero in case previous non zero persist
@@ -44,6 +44,9 @@ int main() {
     key_t key = ftok("shmfile", 66);
     int shmid = shmget(key, 3 * sizeof(int), IPC_EXCL);
     Recieve = (int*)shmat(shmid, (void*)0, SHM_RDONLY);
+
+    thread Motor1(MotorThread, Motor1Pol, Motor1En, Motor1Dir, 4000, 0, &(CranePos[0]), &dirx, &Delay1); //Motor1 thread 
+    thread Motor2(MotorThread, Motor2Pol, Motor2En, Motor2Dir, 2800, 0, &(CranePos[1]), &diry, &Delay2);
 	
     for (EVER)
     {
@@ -65,10 +68,15 @@ int main() {
 }
 
 void InitPins(void){
+    //motor control output:
     pinMode(Motor1Pol,OUTPUT);
     pinMode(Motor1Dir,OUTPUT);
     pinMode(Motor2Pol,OUTPUT);
     pinMode(Motor2Dir,OUTPUT);
+    pinMode(Motor1En,OUTPUT);
+    pinMode(Motor2En,OUTPUT);
+    //endswitch reads:
+
 }
 
 void DefaultMemory() {
@@ -98,43 +106,65 @@ void CopyMemory(int (&JoystPos)[3], int* const Recieve){
 
 
 void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]){
-    CranePos[0] += SetMotor(JoystPos[0], Motor1Dir, Delay1);
-    CranePos[1] += SetMotor(JoystPos[1], Motor2Dir, Delay2);
+    SetMotor(JoystPos[0], dirx, Delay1);
+    SetMotor(JoystPos[1], diry, Delay2);
 } 
 
-int SetMotor(int const &Pos, int Dir, int &Delay)
+void SetMotor(int const &Pos, int &Dir, int &Delay)
 {
-    if(Pos >= 50 || Pos <= -50){
-        if(Pos < 0) digitalWrite(Dir, HIGH); //Set direction based on sign
-        else digitalWrite(Dir, LOW);
-        int speed = abs(Pos);
-        Delay = (((250-speed)*10/3)+333); //Calculate joystick posistion into step period
-        int Exec = 5000/(2*Delay);   //Calculate the amount of steps taking during the delay
-
-        if(Pos > 0) return Exec;
-        else return -Exec;
-    }else{
-        Delay = 0;
+    if (Pos == 0){
+        Dir = -1;
     }
-    return 0;
+    else {
+        if (Pos < 0){
+            Dir = 0;
+        }
+        else{
+            Dir = 1;
+        }
+        Delay = (8*(250-Pos)+200);
+    }
 }
 
-void MotorThread(int Motor, int* Delay){
+void TakeStep(int enable, int motor, int delay){
+    digitalWrite(enable, LOW);
+    digitalWrite(motor, HIGH);
+    delayMicroseconds(delay/4);
+    digitalWrite(motor, LOW);
+    delayMicroseconds(delay);
+}
+
+void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir, int* delay){
     for(EVER){
-        if(*Delay > 300 && *Delay < 5000 ){ // Saftety net if the Delay is out of range 
-            digitalWrite(Motor, HIGH);
-            delayMicroseconds(*Delay);
-            digitalWrite(Motor, LOW);
-            delayMicroseconds(*Delay);
-        }
-        else delayMicroseconds(2000);
+        if(*dir == 1){
+            digitalWrite(MotorDir, HIGH);
+            if (++(*Steps) >= RangeTop)
+            {
+                *Steps =  RangeTop;
+                digitalWrite(enable, HIGH);
+            }
+            else{
+                TakeStep(enable, Motor, *delay);
+            }
+        } else if(*dir == 0){
+            digitalWrite(MotorDir, LOW);
+            if (--(*Steps) <= RangeBot)
+            {
+                *Steps =  RangeBot;
+                digitalWrite(enable, HIGH);
+            }
+            else{
+                TakeStep(enable, Motor, *delay);
+            }
+        } else digitalWrite(enable, HIGH);  
     }
 }
 
 void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]){
     cout << "\r";
     cout << "x:" << JoystPos[0] << ", y:" << JoystPos[1] << ", z:" << JoystPos[2];
-    cout << "| xp:" << CranePos[0] << ", yp:" << CranePos[1] << ", zp:" << CranePos[2] << flush;
+    cout << " | xp:" << CranePos[0] << ", yp:" << CranePos[1] << ", zp:" << CranePos[2];
+    cout << " | Delay1: " << Delay1 << " Delau2: " << Delay2 << flush;
 }
 
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]){  
