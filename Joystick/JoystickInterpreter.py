@@ -4,7 +4,8 @@ import serial.tools.list_ports
 import re
 import numpy as np
 import pickle
-import os, sys
+import os
+import sys
 
 ser = serial.Serial('/dev/ttyUSB0', 460800)
 if ser. isOpen:
