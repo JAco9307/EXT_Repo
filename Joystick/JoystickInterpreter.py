@@ -87,7 +87,7 @@ def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
             if total >= (upval):
                 zO = 1
                 print('UP')
-            elif total =< (downval):
+            elif total =< (1.25*downval):
                 zO = -1
                 print('DOWN')
             else:
@@ -96,7 +96,7 @@ def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
             if total =< (upval):
                 zO = 1
                 print('UP')
-            elif total >= (downval):
+            elif total >= (0.9*downval):
                 zO = -1
                 print('DOWN')
             else:
