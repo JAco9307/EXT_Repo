@@ -4,8 +4,7 @@ import serial.tools.list_ports
 import re
 import numpy as np
 import pickle
-import os
-import sys
+import os, sys
 
 ser = serial.Serial('/dev/ttyUSB0', 460800)
 if ser. isOpen:
@@ -51,7 +50,6 @@ xout = 0
 
 upvalavg = 0
 downvalavg = 0
-polarity = 0
 total = 0
 zout = 0
 
@@ -68,43 +66,33 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
     if V[1] > (dead+deadzone) or V[1] < (dead-deadzone):
         if V[1] > 200:
             out = 200
+            print(out)
         elif V[1] < -200:
             out = -200
+            print(out)
         else:
             out = int(V[1])
+            print(out)
     else:
         out = 0
-
-    print(out)
+        print(out)
 
     return out
 
 def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
     if yO == 0 and xO == 0:
         total = s1+s2+s3+s4
-        if polarity == 1:
-            if total >= (upval):
-                zO = 1
-                print('UP')
-            elif total =< (1.25*downval):
-                zO = -1
-                print('DOWN')
-            else:
-                zO = 0
-        elif polarity == 0:
-            if total =< (upval):
-                zO = 1
-                print('UP')
-            elif total >= (0.9*downval):
-                zO = -1
-                print('DOWN')
-            else:
-                zO = 0
+        if (upval-total) < 0:
+            zO = 1
+            print('down')
+        else:
+            zO = 0
+            print('up')
     return zO
-
+    
 while(True):
     try:
-        if a <= 0:
+        if a <=0:
             #initial setup. cleaning buffers, reading STREAM confirmation, accepting values from autocalibrator
             ser.reset_output_buffer()
             ser.reset_input_buffer()
@@ -124,7 +112,6 @@ while(True):
             xdead = vals[9]
             upvalavg = vals[10]
             downvalavg = vals[11]
-            polarity = vals[12]
             a+=1
             time.sleep(0.005)
 
@@ -134,9 +121,9 @@ while(True):
             #X axis Processing
             xout = StreamReader(testres,sensor3,sensor4,xvalue,xzero,xgrad,xdead,xout,deadZ)
             #updown processing
-            zout = UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
+            zout=UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
             #sending to the controller
-            os.system("CLI " + str(xout) + " " + str(yout) + " " + str(int(zout)))
+            #os.system("CLI " + str(xout) + " " + str(yout) + " " + str(int(zout)))
             time.sleep(0.005)
 
     except KeyboardInterrupt:
