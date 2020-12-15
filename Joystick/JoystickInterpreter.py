@@ -67,16 +67,14 @@ def StreamReader(box1,s1,s2,V,Z,grad,dead,out,deadzone):
     if V[1] > (dead+deadzone) or V[1] < (dead-deadzone):
         if V[1] > 200:
             out = 200
-            print(out)
         elif V[1] < -200:
             out = -200
-            print(out)
         else:
             out = int(V[1])
-            print(out)
     else:
         out = 0
-        print(out)
+
+    print(out)
 
     return out
 
