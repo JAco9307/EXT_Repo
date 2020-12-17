@@ -9,15 +9,19 @@
 using namespace std;
 #define EVER ;;
 
-#define Motor1Pol 1
-#define Motor1En 8
-#define Motor1Dir 16
+#define Motor1Pol 23
+#define Motor1En 9
+#define Motor1Dir 22
 
-#define Motor2Pol 23
-#define Motor2En 9
-#define Motor2Dir 22
+#define Motor2Pol 1
+#define Motor2En 8
+#define Motor2Dir 16
 
-int Delay1 = 0, Delay2 = 0;
+#define EndSwx 29
+#define EndSwy 28
+#define EndSwz 27
+
+int Delay1 = 1800, Delay2 = 1800;
 int dirx = -1, diry = -1;
 
 void InitPins(void);
@@ -28,7 +32,7 @@ void CopyMemory(int (&JoystPos)[3], int* const Recieve);
 void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]);
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]);
 
-void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir, int* delay);
+void MotorThread(int Motor, int enable, int MotorDir, int Range, int EndSw, int* Steps, int* dir, int* delay);
 
 int main() {
     DefaultMemory(); //initializes memory to zero in case previous non zero persist
@@ -45,9 +49,21 @@ int main() {
     int shmid = shmget(key, 3 * sizeof(int), IPC_EXCL);
     Recieve = (int*)shmat(shmid, (void*)0, SHM_RDONLY);
 
-    thread Motor1(MotorThread, Motor1Pol, Motor1En, Motor1Dir, 4000, 0, &(CranePos[0]), &dirx, &Delay1); //Motor1 thread 
-    thread Motor2(MotorThread, Motor2Pol, Motor2En, Motor2Dir, 2800, 0, &(CranePos[1]), &diry, &Delay2);
+    thread Motor1(MotorThread, Motor1Pol, Motor1En, Motor1Dir, 4000, EndSwx, &(CranePos[0]), &dirx, &Delay1); //Motor1 thread 
+    thread Motor2(MotorThread, Motor2Pol, Motor2En, Motor2Dir, 2800, EndSwy, &(CranePos[1]), &diry, &Delay2);
 	
+    int consec = 0;
+    for(EVER){
+        if (digitalRead(EndSwx) && digitalRead(EndSwy)){
+            consec++;
+        }else if (consec>=0) consec--;
+        if (consec > 10) break;
+        MotorControl({-200, -200, 0}, CranePos);
+        DumpVal(JoystPos,CranePos);
+         delayMicroseconds(5000);
+    }
+    MotorControl({0,0,0}, CranePos);
+
     for (EVER)
     {
         //Copy data to local variable, to avoid data changing mid execution
@@ -59,7 +75,7 @@ int main() {
 
         DumpVal(JoystPos,CranePos); //Dumps values to cout for debugging
 
-        delayMicroseconds(5000);
+        delayMicroseconds(1000);
     }
 
     shmdt((void*)Recieve);
@@ -76,7 +92,9 @@ void InitPins(void){
     pinMode(Motor1En,OUTPUT);
     pinMode(Motor2En,OUTPUT);
     //endswitch reads:
-
+    pinMode(EndSwx,INPUT);
+    pinMode(EndSwy,INPUT);
+    pinMode(EndSwz,INPUT);
 }
 
 void DefaultMemory() {
@@ -114,15 +132,26 @@ void SetMotor(int const &Pos, int &Dir, int &Delay)
 {
     if (Pos == 0){
         Dir = -1;
+        Delay = 1800;
     }
     else {
         if (Pos < 0){
+            if (Dir == 1){
+                Delay = 1800;
+            }
             Dir = 0;
         }
         else{
+            if (Dir == 0){
+                Delay = 1800;
+            }
             Dir = 1;
         }
-        Delay = (8*(250-Pos)+200);
+        int TargetDelay = (8*(250-abs(Pos))+200);
+        if (TargetDelay < Delay-10) Delay -= 10;
+        else if (TargetDelay < Delay) Delay--;
+        else if (TargetDelay > Delay+10) Delay += 10;
+        else if (TargetDelay > Delay) Delay++;
     }
 }
 
@@ -134,42 +163,48 @@ void TakeStep(int enable, int motor, int delay){
     delayMicroseconds(delay);
 }
 
-void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir, int* delay){
+void MotorThread(int Motor, int enable, int MotorDir, int Range, int EndSw, int* Steps, int* dir, int* delay){
     for(EVER){
         if(*dir == 1){
             digitalWrite(MotorDir, HIGH);
-            if (++(*Steps) >= RangeTop)
+            if (++(*Steps) >= Range)
             {
-                *Steps =  RangeTop;
+                *Steps =  Range;
                 digitalWrite(enable, HIGH);
+                delayMicroseconds(5000);
             }
             else{
                 TakeStep(enable, Motor, *delay);
             }
         } else if(*dir == 0){
             digitalWrite(MotorDir, LOW);
-            if (--(*Steps) <= RangeBot)
-            {
-                *Steps =  RangeBot;
+            if (digitalRead(EndSw)){
+                *Steps = 0;
                 digitalWrite(enable, HIGH);
+                delayMicroseconds(5000);
             }
             else{
+                (*Steps)--;
                 TakeStep(enable, Motor, *delay);
             }
-        } else digitalWrite(enable, HIGH);  
+        } else {
+            digitalWrite(enable, HIGH);  
+            delayMicroseconds(5000);
+        }
     }
 }
 
 void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]){
-    cout << "\r";
-    cout << "x:" << JoystPos[0] << ", y:" << JoystPos[1] << ", z:" << JoystPos[2];
-    cout << " | xp:" << CranePos[0] << ", yp:" << CranePos[1] << ", zp:" << CranePos[2];
-    cout << " | Delay1: " << Delay1 << " Delau2: " << Delay2 << flush;
+    cout << "x:" << JoystPos[0] << ",\t y:" << JoystPos[1] << ",\t z:" << JoystPos[2];
+    cout << "\t | xp:" << CranePos[0] << "\t, yp:" << CranePos[1] << "\t, zp:" << CranePos[2];
+    cout << "\t | Delay1: " << Delay1 << "\t Delay2: " << Delay2;
+    cout << "\t | Endswitch x: " << digitalRead(EndSwx) << "\t y: " << digitalRead(EndSwy)<< "\t yz " << digitalRead(EndSwz);
+    cout << "\t" << endl;
 }
 
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]){  
     std::ofstream ofs;
     ofs.open("../htdocs/CranePos.txt", std::ofstream::out | std::ofstream::trunc);
-    ofs << JoystPos[0] << ',' << JoystPos[1] << ',' << JoystPos[2] << ';' << CranePos[0]/200 << ',' << CranePos[1]/200 << ',' << CranePos[2];
+    ofs << JoystPos[0] << ',' << JoystPos[1] << ',' << JoystPos[2] << ';' << CranePos[0] << ',' << CranePos[1] << ',' << CranePos[2];
     ofs.close();
 }

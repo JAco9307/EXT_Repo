@@ -19,16 +19,20 @@ using namespace std;
 #define Motor2En 9
 #define Motor2Dir 22
 
+#define EndSwx 29
+#define EndSwy 28
+#define EndSwz 27
+
 #define EVER ;;
 
 int dirx = -1, diry = -1;
-int del1 = 0, del2 = 0;
+int del1 = 0;
 int stepxp = 0, stepyp = 0;
 //static int* del1 = &delpointing1;
 //static int* del2 = &delpointing2;
 
 
-void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir);
+//void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir);
 
 void PinSetup(void);
 
@@ -37,15 +41,15 @@ int main(int argc, char* argv[])
 {
     wiringPiSetup();
     PinSetup();
-    del1 = atoi(argv[1]);
-    del2 = atoi(argv[2]);
-    thread Motor1(MotorThread, Motor1Pol, Motor1En, Motor1Dir, 5000, 0, &stepxp, &dirx); //Motor1 thread 
-    thread Motor2(MotorThread, Motor2Pol, Motor2En, Motor2Dir, 3200, 0, &stepyp, &diry); //Motor1 thread 
-    initscr(); //remember about errors support
+    //del1 = atoi(argv[1]);
+    //thread Motor1(MotorThread, Motor1Pol, Motor1En, Motor1Dir, 4000, 0, &stepxp, &dirx); //Motor1 thread 
+    //thread Motor2(MotorThread, Motor2Pol, Motor2En, Motor2Dir, 2800, 0, &stepyp, &diry); //Motor1 thread 
+    //initscr(); //getchar setup ?
     
-
     while(1){
-        int c = getchar();
+        delayMicroseconds(50000);
+        cout << digitalRead(EndSwx) << " " << digitalRead(EndSwy) << " " << digitalRead(EndSwz) << endl;
+        /*int c = getchar();
         switch(c) {
         case 65:
             dirx = 1;
@@ -63,15 +67,13 @@ int main(int argc, char* argv[])
             diry = 0;
             
             break;
-        case '\r':
-            digitalWrite(Motor1En, HIGH);
-            digitalWrite(Motor2En, HIGH);
+        case '\r':            
             dirx = -1;
             diry = -1;
             break;
         }
         cout << "\rStepx: " << stepxp << " stepy: " << stepyp << endl;
-        cout << "\rDirx: " << dirx << " Diry: " << diry << endl;
+        cout << "\rDirx: " << dirx << " Diry: " << diry << endl;*/
     }
     return 0;
 }
@@ -79,9 +81,9 @@ int main(int argc, char* argv[])
 void TakeStep(int enable, int motor){
     digitalWrite(enable, LOW);
     digitalWrite(motor, HIGH);
-    delayMicroseconds(del1);
+    delayMicroseconds(del1/4);
     digitalWrite(motor, LOW);
-    delayMicroseconds(del2);
+    delayMicroseconds(del1);
 }
 
 void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot, int* Steps, int* dir){
@@ -96,8 +98,7 @@ void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot
             else{
                 TakeStep(enable, Motor);
             }
-        }
-        else if(*dir == 0){
+        } else if(*dir == 0){
             digitalWrite(MotorDir, LOW);
             if (--(*Steps) <= RangeBot)
             {
@@ -107,7 +108,7 @@ void MotorThread(int Motor, int enable, int MotorDir, int RangeTop, int RangeBot
             else{
                 TakeStep(enable, Motor);
             }
-        }        
+        } else digitalWrite(enable, HIGH);  
     }
 }
 
@@ -118,4 +119,7 @@ void PinSetup(void){
     pinMode(Motor2Dir,OUTPUT);
     pinMode(Motor1En,OUTPUT);
     pinMode(Motor2En,OUTPUT);
+    pinMode(EndSwx,INPUT);
+    pinMode(EndSwy,INPUT);
+    pinMode(EndSwz,INPUT);
 }

@@ -37,6 +37,6 @@ int main(int argc, char* argv[])
 
     shmdt((void*)array);
 
-    std::cout << "Recieved args x:" << Delta_x << ", y:" << Delta_y << ", z:" << Delta_z << std::endl;
+    //std::cout << "Recieved args x:" << Delta_x << ", y:" << Delta_y << ", z:" << Delta_z << std::endl;
     return 0;
 }
