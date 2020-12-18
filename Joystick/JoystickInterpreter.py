@@ -97,9 +97,9 @@ def StreamReader(box1,s1,s2,s1prev,s2prev,V,Z,grad,dead,out,deadzone):
 def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
     if yO == 0 and xO == 0:
         total = s1+s2+s3+s4
-        print(total)
-        print(upval)
-        if total > (1.1*upval):
+        #print(total)
+        #print(upval)
+        if total > (1.01*upval):
             print('down')
             z0 = 1
         else:
