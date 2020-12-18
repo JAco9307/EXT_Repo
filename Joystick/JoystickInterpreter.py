@@ -58,6 +58,7 @@ downvalavg = 0
 total = 0
 zout = 0
 
+
 yread = [0,0,0]
 xread = [0,0,0]
 
@@ -91,18 +92,20 @@ def StreamReader(box1,s1,s2,s1prev,s2prev,V,Z,grad,dead,out,deadzone):
     print(out)
     s1prev = s1
     s2prev = s2
-    return [out,s1prev,s2prev]
+    return [out,s1prev,s2prev,s1,s2]
 
 def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
     if yO == 0 and xO == 0:
         total = s1+s2+s3+s4
-        if (upval-total) < 0:
-            zO = 1
+        print(total)
+        print(upval)
+        if total > upval:
             print('down')
+            z0 = 1
         else:
-            zO = 0
             print('up')
-    return zO
+            z0 = 0
+    return z0
 
 while(True):
     try:
@@ -137,13 +140,20 @@ while(True):
             yout = yread[0]
             sensor1prev = yread[1]
             sensor2prev = yread[2]
+            sensor1 = yread[3]
+            sensor2 = yread[4]
             #X axis Processing
             xread = StreamReader(testres,sensor3,sensor4,sensor3prev,sensor4prev,xvalue,xzero,xgrad,xdead,xout,deadZ)
-            xout = yread[0]
-            sensor3prev = yread[1]
-            sensor4prev = yread[2]
+            xout = xread[0]
+            sensor3prev = xread[1]
+            sensor4prev = xread[2]
+            sensor3 = xread[3]
+            sensor4 = xread[4]
             #updown processing
-            zout=UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
+            try:
+                zout=UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
+            except:
+                zout = 0
             #sending to the controller
             os.system("CLI " + str(xout) + " " + str(yout) + " " + str(int(zout)))
             time.sleep(0.1)
