@@ -88,10 +88,7 @@ def StreamReader(box1,s1,s2,s1prev,s2prev,V,Z,grad,dead,out,deadzone):
             out = int(V[1])
     else:
         out = 0
-<<<<<<< HEAD
-=======
     print(out)
->>>>>>> origin/temp
     s1prev = s1
     s2prev = s2
     return [out,s1prev,s2prev]
