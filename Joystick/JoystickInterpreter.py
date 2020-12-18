@@ -99,7 +99,7 @@ def UpDown(yO,xO,upval,downval,zO,s1,s2,s3,s4):
         total = s1+s2+s3+s4
         print(total)
         print(upval)
-        if total > upval:
+        if total > (1.1*upval):
             print('down')
             z0 = 1
         else:
