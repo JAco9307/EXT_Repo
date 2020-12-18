@@ -127,9 +127,11 @@ while(True):
             upvalavg = vals[10]
             downvalavg = vals[11]
             a+=1
-            time.sleep(0.5)
+            time.sleep(0.1)
 
         else:
+            ser.reset_output_buffer()
+            ser.reset_input_buffer()
             #Y axis Processing
             yread = StreamReader(testres,sensor1,sensor2,sensor1prev,sensor2prev,yvalue,yzero,ygrad,ydead,yout,deadZ)
             yout = yread[0]
@@ -144,7 +146,7 @@ while(True):
             zout=UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
             #sending to the controller
             os.system("CLI " + str(xout) + " " + str(yout) + " " + str(int(zout)))
-            time.sleep(0.5)
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         os.system("CLI")
