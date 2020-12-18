@@ -127,7 +127,7 @@ while(True):
             upvalavg = vals[10]
             downvalavg = vals[11]
             a+=1
-            time.sleep(0.1)
+            time.sleep(0.5)
 
         else:
             #Y axis Processing
@@ -144,7 +144,7 @@ while(True):
             zout=UpDown(yout,xout,upvalavg,downvalavg,zout,sensor1,sensor2,sensor3,sensor4)
             #sending to the controller
             os.system("CLI " + str(xout) + " " + str(yout) + " " + str(int(zout)))
-            time.sleep(0.1)
+            time.sleep(0.5)
 
     except KeyboardInterrupt:
         os.system("CLI")
