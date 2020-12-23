@@ -21,6 +21,9 @@ using namespace std;
 #define EndSwy 28
 #define EndSwz 27
 
+#define DC1 24
+#define DC2 25
+
 int Delay1 = 1800, Delay2 = 1800;
 int dirx = -1, diry = -1;
 
@@ -95,6 +98,12 @@ void InitPins(void){
     pinMode(EndSwx,INPUT);
     pinMode(EndSwy,INPUT);
     pinMode(EndSwz,INPUT);
+
+    pinMode(DC1,OUTPUT);
+    pinMode(DC2,OUTPUT);
+
+    digitalWrite(DC1, LOW);
+    digitalWrite(DC2, LOW);
 }
 
 void DefaultMemory() {
@@ -126,6 +135,8 @@ void CopyMemory(int (&JoystPos)[3], int* const Recieve){
 void MotorControl(int const (&JoystPos)[3], int (&CranePos)[3]){
     SetMotor(JoystPos[0], dirx, Delay1);
     SetMotor(JoystPos[1], diry, Delay2);
+    if (JoystPos[2]) digitalWrite(DC1, HIGH);
+    else digitalWrite(DC1, LOW);
 } 
 
 void SetMotor(int const &Pos, int &Dir, int &Delay)
@@ -205,6 +216,6 @@ void DumpVal(int const (&JoystPos)[3], int const (&CranePos)[3]){
 void WriteToFile(int const (&JoystPos)[3], int const (&CranePos)[3]){  
     std::ofstream ofs;
     ofs.open("../htdocs/CranePos.txt", std::ofstream::out | std::ofstream::trunc);
-    ofs << JoystPos[0] << ',' << JoystPos[1] << ',' << JoystPos[2] << ';' << CranePos[0] << ',' << CranePos[1] << ',' << CranePos[2];
+    ofs << JoystPos[0] << ',' << JoystPos[1] << ',' << -JoystPos[2] << ';' << CranePos[0] << ',' << CranePos[1] << ',' << CranePos[2];
     ofs.close();
 }

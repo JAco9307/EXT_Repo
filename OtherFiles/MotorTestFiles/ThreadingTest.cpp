@@ -19,6 +19,9 @@ using namespace std;
 #define Motor2En 9
 #define Motor2Dir 22
 
+#define DC1 24
+#define DC2 25
+
 #define EndSwx 29
 #define EndSwy 28
 #define EndSwz 27
@@ -119,7 +122,11 @@ void PinSetup(void){
     pinMode(Motor2Dir,OUTPUT);
     pinMode(Motor1En,OUTPUT);
     pinMode(Motor2En,OUTPUT);
+    pinMode(DC1,OUTPUT);
+    pinMode(DC2,OUTPUT);
     pinMode(EndSwx,INPUT);
     pinMode(EndSwy,INPUT);
     pinMode(EndSwz,INPUT);
+
+    digitalWrite(DC1, LOW);
 }
